@@ -1,0 +1,31 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <script src="libs/jspdf.umd.min.js"></script>
+    <script src="libs/jspdf.plugin.autotable.min.js"></script>
+    <title>Transcript Downloader</title>
+    <style>
+      body {
+        font-family: Arial, sans-serif;
+        padding: 10px;
+      }
+      button {
+        padding: 8px 12px;
+        border-radius: 6px;
+        cursor: pointer;
+      }
+      #download-transcript:hover {
+        background-color: #cccccc;
+      }
+      h1 {
+        font-size: 18px;
+        margin-bottom: 10px;
+      }
+    </style>
+  </head>
+  <body>
+    <h1>FlexEase</h1>
+    <button id="download-transcript">Download Transcript PDF</button>
+    <script type="module" src="popup.js"></script>
+  </body>
+</html>

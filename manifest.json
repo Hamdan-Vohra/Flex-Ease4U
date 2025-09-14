@@ -1,0 +1,26 @@
+{
+  "name": "FlexEase | FlexE4U",
+  "description": "Flex Ease For You Web Extension",
+  "version": "1.0",
+  "manifest_version": 3,
+  "author": "Hamdan Vohra",
+  "action": {
+    "default_popup": "popup.html",
+    "default_title": "'Flex Ease For You' Extension"
+  },
+  "background": {
+    "service_worker": "background.js",
+    "type": "module"
+  },
+  "web_accessible_resources": [
+    {
+      "resources": [
+        "libs/jspdf.umd.min.js",
+        "libs/jspdf.plugin.autotable.min.js"
+      ],
+      "matches": ["<all_urls>"]
+    }
+  ],
+  "permissions": ["scripting", "activeTab"],
+  "host_permissions": ["https://flexstudent.nu.edu.pk/Student/*"]
+}
