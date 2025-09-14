@@ -21,10 +21,10 @@ document.addEventListener("DOMContentLoaded", function () {
           const pageWidth = doc.internal.pageSize.getWidth();
 
           // 🔹 Header: Logo + University Name side by side
-          const logoWidth = 30;
-          const logoHeight = 30;
+          const logoWidth = 35;
+          const logoHeight = 35;
           const marginTop = 15;
-          const marginLeft = 20;
+          const marginLeft = 10;
 
           // Logo
           doc.addImage(
@@ -38,15 +38,15 @@ document.addEventListener("DOMContentLoaded", function () {
 
           // University Name next to logo
           doc.setFont("helvetica", "bold");
-          doc.setFontSize(14);
+          doc.setFontSize(16);
           doc.text(
             "National University of Computer & Emerging Sciences",
             marginLeft + logoWidth + 5,
-            marginTop + logoWidth / 2 - 5
+            marginTop + logoWidth / 2 - 2
           );
 
           doc.setFont("helvetica", "normal");
-          doc.setFontSize(12);
+          doc.setFontSize(14);
           doc.text(
             campus,
             marginLeft + logoWidth + 5,
