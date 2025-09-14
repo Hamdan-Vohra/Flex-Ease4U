@@ -1,3 +1,12 @@
+const campusMap = {
+  I: "Islamabad Campus",
+  K: "Karachi Campus",
+  F: "Faisalabad Campus",
+  L: "Lahore Campus",
+  P: "Peshawar Campus",
+  M: "Multan Campus",
+};
+
 export function extractStudentInfo(dom) {
   const studentInfo = [];
   const infoNodes = dom.querySelectorAll(
@@ -16,4 +25,12 @@ export function extractStudentInfo(dom) {
   });
 
   return studentInfo;
+}
+
+export function getCampusName(studentInfo) {
+  const rollNo = studentInfo
+    .find((info) => info.title === "Roll No")
+    .value.split("-");
+  const initial = rollNo[0][2];
+  return campusMap[initial] ? campusMap[initial] : "New Campus";
 }
