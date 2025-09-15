@@ -6,7 +6,12 @@
   "author": "Hamdan Vohra",
   "action": {
     "default_popup": "popup.html",
+    "default_icon": "./assets/nu-logo.png",
     "default_title": "'Flex Ease For You' Extension"
+  },
+  "icons": {
+    "128": "./assets/nu-logo.png",
+    "48": "./assets/nu-logo.png"
   },
   "background": {
     "service_worker": "background.js",
