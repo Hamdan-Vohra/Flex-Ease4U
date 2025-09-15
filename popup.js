@@ -4,7 +4,24 @@ import {
 } from "./utils/extractStudentInfo.js";
 import { nuLogoBase64 } from "./utils/nuLogo.js"; // base64 logo
 
+
 document.addEventListener("DOMContentLoaded", function () {
+  (async () => {
+    // Load autoTable plugin only after jsPDF is present
+    if (window.jspdf && typeof window.jspdf.jsPDF.API.autoTable === "undefined") {
+      let script2 = document.createElement("script");
+      script2.src = chrome.runtime.getURL("libs/jspdf.plugin.autotable.min.js");
+      document.body.appendChild(script2);
+      await new Promise((r) => (script2.onload = r));
+    }
+    console.log(
+      "After autoTable load → ",
+      typeof window.jspdf?.jsPDF?.API?.autoTable
+    );
+
+  })();
+
+  //listening for button click
   document
     .getElementById("download-transcript")
     .addEventListener("click", async () => {
@@ -20,7 +37,7 @@ document.addEventListener("DOMContentLoaded", function () {
           const doc = new jsPDF();
           const pageWidth = doc.internal.pageSize.getWidth();
 
-          // 🔹 Header: Logo + University Name side by side
+          // Header: Logo + University Name side by side
           const logoWidth = 35;
           const logoHeight = 35;
           const marginTop = 15;
@@ -71,14 +88,23 @@ document.addEventListener("DOMContentLoaded", function () {
           // 🔹 Student Info in Table
           const tableData = studentInfo.map((info) => [info.title, info.value]);
 
-          doc.autoTable({
-            head: [["Field", "Value"]],
-            body: tableData,
-            startY: 75,
-            theme: "grid",
-            headStyles: { fillColor: [0, 51, 102] }, // navy-blue header
-            styles: { fontSize: 11, cellPadding: 4 },
+          // Display in a simple list instead of table for now
+          let xPos = marginLeft;
+          let yPos = 75;
+          doc.setFont("helvetica", "normal");
+          doc.setFontSize(11);
+          tableData.forEach(([field, value]) => {
+            doc.text(`${field}: ${value}`, xPos, yPos);
+            xPos += 30;
           });
+          // doc.autoTable({
+          //   head: [["Field", "Value"]],
+          //   body: tableData,
+          //   startY: 75,
+          //   theme: "grid",
+          //   headStyles: { fillColor: [0, 51, 102] }, // navy-blue header
+          //   styles: { fontSize: 11, cellPadding: 4 },
+          // });
 
           // 🔹 Save PDF
           doc.save("student_info.pdf");
