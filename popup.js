@@ -1,14 +1,15 @@
-import {
-  extractStudentInfo,
-  getCampusName,
-} from "./utils/extractStudentInfo.js";
+import { extractStudentInfo, getCampusName } from "./utils/studentdetails.js";
 import { nuLogoBase64 } from "./utils/nuLogo.js"; // base64 logo
 
+let studentInfo = null;
 
 document.addEventListener("DOMContentLoaded", function () {
   (async () => {
     // Load autoTable plugin only after jsPDF is present
-    if (window.jspdf && typeof window.jspdf.jsPDF.API.autoTable === "undefined") {
+    if (
+      window.jspdf &&
+      typeof window.jspdf.jsPDF.API.autoTable === "undefined"
+    ) {
       let script2 = document.createElement("script");
       script2.src = chrome.runtime.getURL("libs/jspdf.plugin.autotable.min.js");
       document.body.appendChild(script2);
@@ -18,19 +19,81 @@ document.addEventListener("DOMContentLoaded", function () {
       "After autoTable load → ",
       typeof window.jspdf?.jsPDF?.API?.autoTable
     );
-
   })();
 
+  // Load  persisted states from Local Storage
+  // if (chrome && chrome.storage && chrome.storage.local) {
+  //   chrome.storage.local.get("studentInfo", (result) => {
+  //     if (result.studentInfo) {
+  //       studentInfo = result.studentInfo;
+  //       console.log("Loaded studentInfo from storage:", studentInfo);
+  //     }
+  //   });
+  // } else {
+  //   console.warn("chrome.storage.local is not available.");
+  // }
+
   //listening for button click
+  document.getElementById("get-details").addEventListener("click", () => {
+    chrome.runtime.sendMessage({ action: "getContent" }, (response) => {
+      if (response.success) {
+        const HTMLcontent = response.content;
+        const url = response.url;
+        try {
+          const u = new URL(url);
+          if (
+            !(
+              u.origin === "https://flexstudent.nu.edu.pk" && u.pathname === "/"
+            )
+          ) {
+            chrome.tabs.query({ active: true, currentWindow: true }, (tabs) => {
+              chrome.tabs.sendMessage(tabs[0].id, {
+                action: "showInstructionModal",
+                message:
+                  "To extract the student details, please go to the Home page.",
+              });
+            });
+            return;
+          }
+        } catch (e) {
+          console.error("Invalid URL:", url);
+        }
+        const dom = new DOMParser().parseFromString(HTMLcontent, "text/html");
+
+        studentInfo = extractStudentInfo(dom, url);
+        // chrome.storage.local.set({ studentInfo }); // persist
+        console.log("Student Info:", studentInfo);
+      } else {
+        chrome.tabs.query({ active: true, currentWindow: true }, (tabs) => {
+          chrome.tabs.sendMessage(tabs[0].id, {
+            action: "showInstructionModal",
+            message: "Reload Page.",
+          });
+        });
+      }
+    });
+  });
+
   document
     .getElementById("download-transcript")
     .addEventListener("click", async () => {
       chrome.runtime.sendMessage({ action: "getContent" }, (response) => {
         if (response.success) {
           const HTMLcontent = response.content;
+          const url = response.url;
           const dom = new DOMParser().parseFromString(HTMLcontent, "text/html");
+          if (!studentInfo) {
+            // studentInfo = extractStudentInfo(dom,url);
+            chrome.tabs.query({ active: true, currentWindow: true }, (tabs) => {
+              chrome.tabs.sendMessage(tabs[0].id, {
+                action: "showInstructionModal",
+                message:
+                  "Please go to the Home page first to extract student details.",
+              });
+            });
+            return;
+          }
 
-          const studentInfo = extractStudentInfo(dom);
           const campus = getCampusName(studentInfo);
 
           const { jsPDF } = window.jspdf;
