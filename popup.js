@@ -1,5 +1,7 @@
 import { extractStudentInfo } from "./utils/studentdetails.js";
 import { nuLogoBase64 } from "./utils/nuLogo.js"; // base64 logo
+import { extractTranscriptSemesters } from "./utils/transcriptdetails.js";
+
 const masterData = {
   campusMap: {
     I: "Islamabad Campus",
@@ -121,37 +123,112 @@ document.addEventListener("DOMContentLoaded", function () {
           const HTMLcontent = response.content;
 
           const dom = new DOMParser().parseFromString(HTMLcontent, "text/html");
-          if (!studentInfo) {
+          if (!studentInfo || response.url.indexOf("/Transcript") === -1) {
             // studentInfo = extractStudentInfo(dom,url);
             chrome.tabs.query({ active: true, currentWindow: true }, (tabs) => {
               chrome.tabs.sendMessage(tabs[0].id, {
                 action: "showInstructionModal",
                 message:
-                  "Please go to the Home page first to extract student details.",
+                  "Please go to the Home page first to extract student details. Then try downloading the transcript from the Transcript Page.",
               });
             });
             return;
           }
           const { jsPDF } = window.jspdf;
-          const doc = new jsPDF();
+          const doc = new jsPDF({ format: "legal", unit: "mm" });
 
           // Transcript Header
           setHeader(doc);
 
           // Student Information
-          setStudentInfo(doc);
+          const tableStart = setStudentInfo(doc);
+
           // Transcript Table
+          const semesters = extractTranscriptSemesters(dom);
 
-          // doc.autoTable({
-          //   head: [["Field", "Value"]],
-          //   body: tableData,
-          //   startY: 75,
-          //   theme: "grid",
-          //   headStyles: { fillColor: [0, 51, 102] }, // navy-blue header
-          //   styles: { fontSize: 11, cellPadding: 4 },
-          // });
+          const pageWidth = doc.internal.pageSize.getWidth();
+          const colWidth = (pageWidth - masterData.marginLeft * 2 - 10) / 2;
+          let y = 90;
+          let prevY = y;
 
-          // 🔹 Save PDF
+          for (let i = 0; i < semesters.length; i += 1) {
+            const Sem = semesters[i];
+
+            let sectionHeight = 0;
+            // Determine column (left/right)
+            const colX =
+              i % 2
+                ? masterData.marginLeft + colWidth + 10
+                : masterData.marginLeft;
+            // Determine start Y position
+            const startY = (i % 2 === 0 ? y : prevY) + 5;
+
+            //Semester Name
+            doc.setFont(masterData.font, "bold");
+            doc.setFontSize(masterData.headingSize.small);
+            doc.text(Sem.semesterName, colX, startY);
+
+            // Courses Table
+            doc.autoTable({
+              startY: startY + 4,
+              margin: {
+                left: colX,
+                right: masterData.marginLeft,
+                top: 0,
+                bottom: 0,
+              },
+              tableWidth: colWidth,
+              head: [["Code", "Course Title", "Crd", "Pnts", "Grd", "Type"]],
+              body: Sem.courses.map((r) => [
+                r.Code,
+                r.CourseTitle,
+                r.Crd,
+                r.Pnts,
+                r.Grd,
+                r.Type,
+              ]),
+              styles: { fontSize: 7, cellPadding: 1 },
+              headStyles: { fillColor: [0, 51, 102] },
+              theme: "grid",
+              pageBreak: "avoid",
+            });
+
+            sectionHeight = doc.lastAutoTable.finalY;
+
+            // Semester's Summary
+            let summaryY = sectionHeight + 5;
+            doc.setFont(masterData.font, "normal");
+            doc.setFontSize(masterData.textSize.normal);
+            doc.text(
+              `Credits Attempted: ${Sem.summary["Cr. Att"] || ""}`,
+              colX,
+              summaryY
+            );
+            doc.text(
+              `Credits Earned: ${Sem.summary["Cr. Ernd"] || ""}`,
+              colX,
+              summaryY + 5
+            );
+            doc.text(
+              `GPA: ${Sem.summary["SGPA"] || ""}`,
+              colX + colWidth,
+              summaryY,
+              { align: "right" }
+            );
+            doc.text(
+              `CGPA: ${Sem.summary["CGPA"] || ""}`,
+              colX + colWidth,
+              summaryY + 5,
+              { align: "right" }
+            );
+            sectionHeight = summaryY + 10;
+
+            // Move y to the next row, using the max height of the two columns
+            prevY = y;
+            y = Math.max(sectionHeight, y);
+          }
+
+          // Save PDF
           doc.save("student_info.pdf");
         } else {
           console.error("Error fetching content:", response.error);
@@ -289,4 +366,6 @@ function setStudentInfo(doc) {
     doc.text(`${item.label}: ${item.value}`, rightX, y, { align: "right" });
     y += lineHeight;
   });
+
+  return y;
 }
