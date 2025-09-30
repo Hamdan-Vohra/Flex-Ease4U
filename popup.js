@@ -39,7 +39,7 @@ const masterData = {
   font: "helvetica",
   logoWidth: 35,
   logoHeight: 35,
-  marginTop: 15,
+  marginTop: 10,
   marginLeft: 10,
 };
 let studentInfo = null;
@@ -63,16 +63,16 @@ document.addEventListener("DOMContentLoaded", function () {
   })();
 
   // Load  persisted states from Local Storage
-  // if (chrome && chrome.storage && chrome.storage.local) {
-  //   chrome.storage.local.get("studentInfo", (result) => {
-  //     if (result.studentInfo) {
-  //       studentInfo = result.studentInfo;
-  //       console.log("Loaded studentInfo from storage:", studentInfo);
-  //     }
-  //   });
-  // } else {
-  //   console.warn("chrome.storage.local is not available.");
-  // }
+  if (chrome && chrome.storage && chrome.storage.local) {
+    chrome.storage.local.get("studentInfo", (result) => {
+      if (result.studentInfo) {
+        studentInfo = result.studentInfo;
+        console.log("Loaded studentInfo from storage:", studentInfo);
+      }
+    });
+  } else {
+    console.warn("chrome.storage.local is not available.");
+  }
 
   //listening for button click
   document.getElementById("get-details").addEventListener("click", () => {
@@ -102,8 +102,15 @@ document.addEventListener("DOMContentLoaded", function () {
         const dom = new DOMParser().parseFromString(HTMLcontent, "text/html");
 
         studentInfo = extractStudentInfo(dom, url);
-        // chrome.storage.local.set({ studentInfo }); // persist
-        console.log("Student Info:", studentInfo);
+        // Persist to chrome.storage.local
+        if (chrome && chrome.storage && chrome.storage.local) {
+          chrome.storage.local.set({ studentInfo }, () => {
+            console.log("Student Info saved to chrome.storage.local");
+          });
+        } else {
+          console.warn("chrome.storage.local is not available.");
+        }
+        console.log("Extracted Student Info:", studentInfo);
       } else {
         chrome.tabs.query({ active: true, currentWindow: true }, (tabs) => {
           chrome.tabs.sendMessage(tabs[0].id, {
@@ -136,100 +143,24 @@ document.addEventListener("DOMContentLoaded", function () {
           }
           const { jsPDF } = window.jspdf;
           const doc = new jsPDF({ format: "legal", unit: "mm" });
-
+          let y = 60;
           // Transcript Header
-          setHeader(doc);
+          y = setHeader(doc);
 
           // Student Information
-          const tableStart = setStudentInfo(doc);
+          const tableStart = setStudentInfo(doc, y);
 
           // Transcript Table
           const semesters = extractTranscriptSemesters(dom);
 
-          const pageWidth = doc.internal.pageSize.getWidth();
-          const colWidth = (pageWidth - masterData.marginLeft * 2 - 10) / 2;
-          let y = 90;
-          let prevY = y;
+          //Display Tables on PDF
+          setSemestersTable(semesters, tableStart, doc);
 
-          for (let i = 0; i < semesters.length; i += 1) {
-            const Sem = semesters[i];
-
-            let sectionHeight = 0;
-            // Determine column (left/right)
-            const colX =
-              i % 2
-                ? masterData.marginLeft + colWidth + 10
-                : masterData.marginLeft;
-            // Determine start Y position
-            const startY = (i % 2 === 0 ? y : prevY) + 5;
-
-            //Semester Name
-            doc.setFont(masterData.font, "bold");
-            doc.setFontSize(masterData.headingSize.small);
-            doc.text(Sem.semesterName, colX, startY);
-
-            // Courses Table
-            doc.autoTable({
-              startY: startY + 4,
-              margin: {
-                left: colX,
-                right: masterData.marginLeft,
-                top: 0,
-                bottom: 0,
-              },
-              tableWidth: colWidth,
-              head: [["Code", "Course Title", "Crd", "Pnts", "Grd", "Type"]],
-              body: Sem.courses.map((r) => [
-                r.Code,
-                r.CourseTitle,
-                r.Crd,
-                r.Pnts,
-                r.Grd,
-                r.Type,
-              ]),
-              styles: { fontSize: 7, cellPadding: 1 },
-              headStyles: { fillColor: [0, 51, 102] },
-              theme: "grid",
-              pageBreak: "avoid",
-            });
-
-            sectionHeight = doc.lastAutoTable.finalY;
-
-            // Semester's Summary
-            let summaryY = sectionHeight + 5;
-            doc.setFont(masterData.font, "normal");
-            doc.setFontSize(masterData.textSize.normal);
-            doc.text(
-              `Credits Attempted: ${Sem.summary["Cr. Att"] || ""}`,
-              colX,
-              summaryY
-            );
-            doc.text(
-              `Credits Earned: ${Sem.summary["Cr. Ernd"] || ""}`,
-              colX,
-              summaryY + 5
-            );
-            doc.text(
-              `GPA: ${Sem.summary["SGPA"] || ""}`,
-              colX + colWidth,
-              summaryY,
-              { align: "right" }
-            );
-            doc.text(
-              `CGPA: ${Sem.summary["CGPA"] || ""}`,
-              colX + colWidth,
-              summaryY + 5,
-              { align: "right" }
-            );
-            sectionHeight = summaryY + 10;
-
-            // Move y to the next row, using the max height of the two columns
-            prevY = y;
-            y = Math.max(sectionHeight, y);
-          }
+          // Footer
+          setFooter(doc);
 
           // Save PDF
-          doc.save("student_info.pdf");
+          doc.save("student_transcript.pdf");
         } else {
           console.error("Error fetching content:", response.error);
         }
@@ -269,11 +200,12 @@ function setHeader(doc) {
     masterData.marginTop + masterData.logoWidth / 2 + 5
   );
 
+  let y = masterData.marginTop + masterData.logoHeight + 10;
   // Interim Transcript Title
   doc.setFont(masterData.font, "bold");
   doc.setFontSize(masterData.headingSize.large);
   doc.setTextColor(0, 51, 102); // light navy-blue (RGB)
-  doc.text("INTERIM TRANSCRIPT", pageWidth / 2, 55, {
+  doc.text("INTERIM TRANSCRIPT", pageWidth / 2, y - 5, {
     align: "center",
   });
 
@@ -282,7 +214,7 @@ function setHeader(doc) {
 
   // Horizontal Line
   doc.setLineWidth(0.5);
-  doc.line(10, 65, pageWidth - 10, 65);
+  doc.line(10, y, pageWidth - 10, y);
 
   doc.setFontSize(masterData.headingSize.small);
   const degreeName =
@@ -296,22 +228,24 @@ function setHeader(doc) {
     masterData.programMap[programCode] || "Unknown Program";
   const degreeFullName = masterData.degreeMap[degree[0]] || "Unknown Degree";
   const finalName = `${degreeFullName} ( ${programFullName} )`;
-  doc.text(finalName, pageWidth / 2, 72, {
+  y += 5;
+  doc.text(finalName, pageWidth / 2, y, {
     align: "center",
   });
 
   // Reset font
   doc.setFont(masterData.font, "normal");
   doc.setFontSize(masterData.textSize.normal);
+
+  return y;
 }
 
-function setStudentInfo(doc) {
+function setStudentInfo(doc, y_start) {
   const pageWidth = doc.internal.pageSize.getWidth();
   const marginLeft = masterData.marginLeft;
   const marginRight = masterData.marginLeft;
-  const colGap = 10; // gap between columns
   const lineHeight = 5;
-  const startY = 80;
+  const startY = y_start + 5; // Start below header
 
   // Map for label overrides
   const labelMap = {
@@ -368,4 +302,159 @@ function setStudentInfo(doc) {
   });
 
   return y;
+}
+
+function setSemestersTable(semesters, tableStart, doc) {
+  // Two-column layout for semesters
+  const pageWidth = doc.internal.pageSize.getWidth();
+  const colWidth = (pageWidth - masterData.marginLeft * 2 - 10) / 2;
+  let y = tableStart;
+  let prevY = y;
+
+  for (let i = 0; i < semesters.length; i += 1) {
+    const Sem = semesters[i];
+
+    let sectionHeight = 0;
+    // Determine column (left/right)
+    const colX =
+      i % 2 ? masterData.marginLeft + colWidth + 10 : masterData.marginLeft;
+    // Determine start Y position
+    const startY = (i % 2 === 0 ? y : prevY) + 5;
+
+    //Semester Name
+    doc.setFont(masterData.font, "bold");
+    doc.setFontSize(masterData.headingSize.small);
+    doc.text(Sem.semesterName, colX, startY);
+
+    // Courses Table
+    doc.autoTable({
+      startY: startY + 4,
+      margin: {
+        left: colX,
+        right: masterData.marginLeft,
+        top: 0,
+        bottom: 0,
+      },
+      tableWidth: colWidth,
+      head: [["Code", "Course Title", "Crd", "Pnts", "Grd", "Type"]],
+      body: Sem.courses.map((r) => [
+        r.Code,
+        r.CourseTitle,
+        r.Crd,
+        r.Pnts,
+        r.Grd,
+        r.Type,
+      ]),
+      styles: { fontSize: 7, cellPadding: 1 },
+      headStyles: { fillColor: [0, 51, 102] },
+      theme: "grid",
+      pageBreak: "avoid",
+    });
+
+    sectionHeight = doc.lastAutoTable.finalY;
+
+    // Semester's Summary
+    let summaryY = sectionHeight + 5;
+    doc.setFont(masterData.font, "normal");
+    doc.setFontSize(masterData.textSize.small);
+    doc.text(
+      `Credits Attempted: ${Sem.summary["Cr. Att"] || ""}`,
+      colX,
+      summaryY
+    );
+    doc.text(
+      `Credits Earned: ${Sem.summary["Cr. Ernd"] || ""}`,
+      colX,
+      summaryY + 3
+    );
+    doc.text(`GPA: ${Sem.summary["SGPA"] || ""}`, colX + colWidth, summaryY, {
+      align: "right",
+    });
+    doc.text(
+      `CGPA: ${Sem.summary["CGPA"] || ""}`,
+      colX + colWidth,
+      summaryY + 3,
+      { align: "right" }
+    );
+    sectionHeight = summaryY + 5;
+
+    // Move y to the next row, using the max height of the two columns
+    prevY = y;
+    y = Math.max(sectionHeight, y);
+  }
+
+  // Transcript Summary (custom layout)
+  const crdsErnd = semesters.reduce((sum, sem) => {
+    const val = parseFloat(sem.summary["Cr. Ernd"]);
+    return sum + (isNaN(val) ? 0 : val);
+  }, 0);
+  const crdsAtt = semesters.reduce((sum, sem) => {
+    const val = parseFloat(sem.summary["Cr. Att"]);
+    return sum + (isNaN(val) ? 0 : val);
+  }, 0);
+  const cgpa =
+    semesters.length > 0
+      ? semesters[semesters.length - 1].summary["CGPA"] || ""
+      : "";
+
+  // If you have percentage, calculate or fetch it here
+  const percentage = cgpa ? (parseFloat(cgpa) * 25).toFixed(2) : ""; // Example conversion
+
+  const leftX = masterData.marginLeft;
+  const boxWidth = pageWidth - masterData.marginLeft * 2;
+  const boxHeight = 16; // Enough for two lines
+  const ySummary = y + 5;
+
+  // Draw rectangle for summary
+  doc.setDrawColor(0, 51, 102); // navy border
+  doc.setLineWidth(0.5);
+  doc.rect(leftX, ySummary, boxWidth, boxHeight);
+
+  // Set font and size
+  doc.setFont(masterData.font, "bold");
+  doc.setFontSize(masterData.textSize.small);
+
+  // First line: Credits Required, Credits Completed, Credits Attempted
+  const firstLine = [
+    `Credits Required: 130`,
+    `Credits Completed: ${crdsErnd}`,
+    `Credits Attempted: ${crdsAtt}`,
+  ];
+  const firstLineSpacing = boxWidth / firstLine.length;
+
+  firstLine.forEach((text, idx) => {
+    doc.text(text, 5 + leftX + firstLineSpacing * idx, ySummary + 5);
+  });
+
+  // Second line: CGPA Required, CGPA, Percentage
+  const secondLine = [
+    `CGPA Required: 2.00`,
+    `CGPA: ${cgpa}`,
+    `Percentage: ${percentage}`,
+  ];
+  const secondLineSpacing = boxWidth / secondLine.length;
+
+  secondLine.forEach((text, idx) => {
+    doc.text(text, 5 + leftX + secondLineSpacing * idx, ySummary + 11);
+  });
+}
+
+function setFooter(doc) {
+  const pageHeight = doc.internal.pageSize.getHeight();
+  const pageWidth = doc.internal.pageSize.getWidth();
+  const footerY = pageHeight - 10;
+  doc.setDrawColor(0, 0, 0);
+  doc.setLineWidth(0.5);
+  doc.line(10, footerY, pageWidth - 10, footerY);
+  doc.setFont(masterData.font, "normal");
+  doc.setFontSize(masterData.textSize.small);
+  const generationDate = new Date().toLocaleDateString();
+  doc.text(
+    `Issued Date: ${generationDate}.`,
+    pageWidth - masterData.marginLeft,
+    footerY + 5,
+    {
+      align: "right",
+    }
+  );
 }
