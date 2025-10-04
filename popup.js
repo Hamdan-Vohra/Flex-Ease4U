@@ -75,8 +75,10 @@ document.addEventListener("DOMContentLoaded", function () {
   }
 
   //listening for button click
-  document.getElementById("get-details").addEventListener("click", () => {
-    chrome.runtime.sendMessage({ action: "getContent" }, (response) => {
+  const getDetailsBtn = document.getElementById("get-details");
+
+  getDetailsBtn.addEventListener("click", function () {
+    chrome.runtime.sendMessage({ action: "getContent" }, async (response) => {
       if (response.success) {
         const HTMLcontent = response.content;
         const url = response.url;
@@ -99,9 +101,25 @@ document.addEventListener("DOMContentLoaded", function () {
         } catch (e) {
           console.error("Invalid URL:", url);
         }
-        const dom = new DOMParser().parseFromString(HTMLcontent, "text/html");
 
-        studentInfo = extractStudentInfo(dom, url);
+        const dom = new DOMParser().parseFromString(HTMLcontent, "text/html");
+        let extracted = {};
+        try {
+          extracted = await extractStudentInfo(dom);
+        } catch (err) {
+          console.error("Error extracting student info:", err);
+          chrome.tabs.query({ active: true, currentWindow: true }, (tabs) => {
+            chrome.tabs.sendMessage(tabs[0].id, {
+              action: "showInstructionModal",
+              message:
+                "Unable to extract student details. Please reload and try again.",
+            });
+          });
+          return; // stop here
+        }
+
+        const { studentInfo } = extracted;
+
         // Persist to chrome.storage.local
         if (chrome && chrome.storage && chrome.storage.local) {
           chrome.storage.local.set({ studentInfo }, () => {
@@ -110,7 +128,8 @@ document.addEventListener("DOMContentLoaded", function () {
         } else {
           console.warn("chrome.storage.local is not available.");
         }
-        console.log("Extracted Student Info:", studentInfo);
+
+        getDetailsBtn.classList.add("clicked");
       } else {
         chrome.tabs.query({ active: true, currentWindow: true }, (tabs) => {
           chrome.tabs.sendMessage(tabs[0].id, {
@@ -125,7 +144,7 @@ document.addEventListener("DOMContentLoaded", function () {
   document
     .getElementById("download-transcript")
     .addEventListener("click", async () => {
-      chrome.runtime.sendMessage({ action: "getContent" }, (response) => {
+      chrome.runtime.sendMessage({ action: "getContent" }, async (response) => {
         if (response.success) {
           const HTMLcontent = response.content;
 
@@ -148,7 +167,7 @@ document.addEventListener("DOMContentLoaded", function () {
           y = setHeader(doc);
 
           // Student Information
-          const tableStart = setStudentInfo(doc, y);
+          const tableStart = await setStudentInfo(doc, y); // Make setStudentInfo async
 
           // Transcript Table
           const semesters = extractTranscriptSemesters(dom);
@@ -240,12 +259,15 @@ function setHeader(doc) {
   return y;
 }
 
-function setStudentInfo(doc, y_start) {
+async function setStudentInfo(doc, y_start) {
   const pageWidth = doc.internal.pageSize.getWidth();
   const marginLeft = masterData.marginLeft;
-  const marginRight = masterData.marginLeft;
-  const lineHeight = 5;
-  const startY = y_start + 5; // Start below header
+  const centerX = pageWidth / 2 + 5;
+  const leftlabelWidth = 26;
+  const rightlabelWidth = 15;
+  const valueGap = 2;
+  const lineHeight = 4;
+  const startY = y_start + 10;
 
   // Map for label overrides
   const labelMap = {
@@ -261,45 +283,50 @@ function setStudentInfo(doc, y_start) {
 
   // Define which fields to show in each column
   const leftFields = ["Name", "DOB", "CNIC", "Gender"];
-  const rightFields = ["Roll No", "Batch", "Roll No", "Status"]; // "Roll No" used for both Roll No and Reg No
+  const rightFields = ["Roll No", "Batch", "Reg No", "Status"];
 
   // Helper to get value by field
   function getValue(field) {
     const item = studentInfo.find((info) => info.title === field);
+    if (field === "DOB" && item && item.value) {
+      return formatDOB(item.value);
+    }
     return item ? item.value : "";
   }
 
-  // Prepare left and right column data
-  const leftCol = leftFields.map((field) => ({
-    label: labelMap[field] || field,
-    value: getValue(field),
-  }));
-
-  // For Reg No, use Roll No value but label as Reg No
-  const rightCol = [
-    { label: "Roll No", value: getValue("Roll No") },
-    { label: "Batch", value: getValue("Batch") },
-    { label: "Reg No", value: getValue("Roll No") },
-    { label: "Status", value: getValue("Status") },
-  ];
-
-  // X positions
-  const leftX = marginLeft;
-  const rightX = pageWidth - marginRight;
-
-  // Print left column (left-aligned)
+  // Print left column (labels and values aligned)
   let y = startY;
-  leftCol.forEach((item) => {
-    doc.text(`${item.label}: ${item.value}`, leftX, y, { align: "left" });
+  leftFields.forEach((field) => {
+    const label = labelMap[field] || field;
+    const value = getValue(field);
+    doc.setFont(masterData.font, "bold");
+    doc.text(label + ":", marginLeft, y, { align: "left" });
+    doc.setFont(masterData.font, "normal");
+    doc.text(value, marginLeft + leftlabelWidth + valueGap, y, {
+      align: "left",
+    });
     y += lineHeight;
   });
 
-  // Print right column (right-aligned)
+  // Print right column (labels and values aligned, starting from center)
   y = startY;
-  rightCol.forEach((item) => {
-    doc.text(`${item.label}: ${item.value}`, rightX, y, { align: "right" });
+  rightFields.forEach((field) => {
+    const label = labelMap[field] || field;
+    const value = getValue(field);
+    doc.setFont(masterData.font, "bold");
+    doc.text(label + ":", centerX, y, { align: "left" });
+    doc.setFont(masterData.font, "normal");
+    doc.text(value, centerX + rightlabelWidth + valueGap, y, { align: "left" });
     y += lineHeight;
   });
+
+  // Calculate image position
+  const imgWidth = 22;
+  const imgHeight = 26;
+  const imgX = pageWidth - masterData.marginLeft - imgWidth;
+  const imgY = y_start;
+
+  await addProfileImage(doc, imgX, imgY, imgWidth, imgHeight);
 
   return y;
 }
@@ -457,4 +484,43 @@ function setFooter(doc) {
       align: "right",
     }
   );
+}
+
+function formatDOB(dobStr) {
+  const months = [
+    "January",
+    "February",
+    "March",
+    "April",
+    "May",
+    "June",
+    "July",
+    "August",
+    "September",
+    "October",
+    "November",
+    "December",
+  ];
+  const [month, day, year] = dobStr.split("/");
+  if (!month || !day || !year) return dobStr;
+  return `${months[parseInt(month, 10) - 1]} ${parseInt(day, 10)}, ${year}`;
+}
+
+function addProfileImage(doc, x, y, width, height) {
+  return new Promise((resolve) => {
+    chrome.runtime.sendMessage(
+      { action: "getProfileImageBase64" },
+      (response) => {
+        if (response.success && response.base64) {
+          doc.addImage(response.base64, "JPEG", x, y, width, height);
+        } else {
+          console.warn(
+            "Profile image not found or error occurred:",
+            response.error
+          );
+        }
+        resolve();
+      }
+    );
+  });
 }

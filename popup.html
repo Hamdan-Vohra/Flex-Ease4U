@@ -13,20 +13,72 @@
         padding: 8px 12px;
         border-radius: 6px;
         cursor: pointer;
+        display: inline-flex;
+        align-items: center;
+        gap: 6px;
+      }
+
+      /* Fetch button */
+      #get-details {
+        background-color: #4caf50;
+        color: white;
+        border: none;
+        margin-bottom: 10px;
+      }
+      #get-details:hover {
+        background-color: #45a049;
+      }
+      #get-details.clicked {
+        background-color: #002d03;
+      }
+
+      /* Download Transcript button */
+      #download-transcript {
+        background-color: #e7e7e7;
+        color: black;
+        border: none;
       }
       #download-transcript:hover {
         background-color: #cccccc;
       }
+
       h1 {
         font-size: 18px;
         margin-bottom: 10px;
+        text-align: center;
+      }
+
+      /* SVG icon style */
+      .icon {
+        width: 16px;
+        height: 16px;
+        fill: currentColor;
       }
     </style>
   </head>
   <body>
     <h1>FlexEase</h1>
-    <button id="get-details" title="Required page: Home">Get Student Details</button>
-    <button id="download-transcript" title="Required page: Transcript">Download Transcript PDF</button>
+    <button id="get-details" title="Required page: Home">
+      Fetch Student Details
+    </button>
+    <button id="download-transcript" title="Required page: Transcript">
+      <svg
+        width="24"
+        height="24"
+        viewBox="0 0 24 24"
+        fill="none"
+        stroke="currentColor"
+        stroke-width="2"
+        stroke-linecap="round"
+        stroke-linejoin="round"
+      >
+        <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
+        <polyline points="7 10 12 15 17 10"></polyline>
+        <line x1="12" y1="15" x2="12" y2="3"></line>
+      </svg>
+      Transcript
+    </button>
+
     <script type="module" src="popup.js"></script>
   </body>
 </html>
