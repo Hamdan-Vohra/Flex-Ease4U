@@ -25,7 +25,8 @@
     {
       "matches": ["https://flexstudent.nu.edu.pk/Student/Transcript*"],
       "js": ["./content_scripts/injectDownloadButton.js"],
-      "run_at": "document_end"
+      "run_at": "document_end",
+      "type": "module"
     }
   ],
   "web_accessible_resources": [

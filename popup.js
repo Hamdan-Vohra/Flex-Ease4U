@@ -1,5 +1,5 @@
 import { extractStudentInfo } from "./utils/studentdetails.js";
-import { nuLogoBase64 } from "./utils/nuLogo.js"; // base64 logo
+import { nuLogoBase64 } from "./utils/nuLogo.js"; 
 import { extractTranscriptSemesters } from "./utils/transcriptdetails.js";
 
 const masterData = {
@@ -150,7 +150,6 @@ document.addEventListener("DOMContentLoaded", function () {
 
           const dom = new DOMParser().parseFromString(HTMLcontent, "text/html");
           if (!studentInfo || response.url.indexOf("/Transcript") === -1) {
-            // studentInfo = extractStudentInfo(dom,url);
             chrome.tabs.query({ active: true, currentWindow: true }, (tabs) => {
               chrome.tabs.sendMessage(tabs[0].id, {
                 action: "showInstructionModal",
