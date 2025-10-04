@@ -27,6 +27,11 @@
       "js": ["./content_scripts/injectDownloadButton.js"],
       "run_at": "document_end",
       "type": "module"
+    },
+    {
+      "matches": ["https://flexstudent.nu.edu.pk/*"],
+      "js": ["content_scripts/removeBlockScript.js"],
+      "run_at": "document_end"
     }
   ],
   "web_accessible_resources": [

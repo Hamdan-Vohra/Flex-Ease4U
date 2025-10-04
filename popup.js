@@ -1,5 +1,5 @@
 import { extractStudentInfo } from "./utils/studentdetails.js";
-import { nuLogoBase64 } from "./utils/nuLogo.js"; 
+import { nuLogoBase64 } from "./utils/nuLogo.js";
 import { extractTranscriptSemesters } from "./utils/transcriptdetails.js";
 
 const masterData = {
@@ -73,6 +73,24 @@ document.addEventListener("DOMContentLoaded", function () {
   } else {
     console.warn("chrome.storage.local is not available.");
   }
+
+  document
+    .getElementById("remove-block-script")
+    .addEventListener("click", () => {
+      chrome.tabs.query({ active: true, currentWindow: true }, (tabs) => {
+        chrome.tabs.sendMessage(
+          tabs[0].id,
+          { action: "removeBlockScript" },
+          (response) => {
+            if (response && response.success) {
+              alert("Block script removed successfully.");
+            } else {
+              alert("Failed to remove block script.");
+            }
+          }
+        );
+      });
+    });
 
   //listening for button click
   const getDetailsBtn = document.getElementById("get-details");
