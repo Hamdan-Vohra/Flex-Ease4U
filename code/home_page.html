@@ -1,0 +1,723 @@
+<html lang="en" class="wf-montserrat-n3-active wf-montserrat-n4-active wf-montserrat-n5-active wf-montserrat-n6-active wf-montserrat-n7-active wf-roboto-n3-active wf-roboto-n4-active wf-roboto-n5-active wf-roboto-n6-active wf-roboto-n7-active wf-active"><!-- begin::Head --><head>
+    <style>
+        #overlay23 {
+            position: sticky;
+            display: inline-block;
+            width: 15%;
+            height: 15%;
+            top: 50%;
+            left: 50%;
+            right: 50%;
+            bottom: 50%;
+            padding-top: 20px;
+            background-color: white;
+            z-index: 2;
+            text-align: center;
+            vertical-align: middle;
+        }
+    </style>
+    <meta charset="utf-8">
+    <title>
+        Flex | Student
+    </title>
+    <meta name="description" content="Latest updates and statistic charts">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+    <!--begin::Web font -->
+    <script src="https://ajax.googleapis.com/ajax/libs/webfont/1.6.16/webfont.js"></script>
+    <script type="text/javascript" src="/Content/jquery.js"></script>
+    
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Montserrat:300,400,500,600,700%7CRoboto:300,400,500,600,700" media="all"><script>
+        WebFont.load({
+            google: { "families": ["Montserrat:300,400,500,600,700", "Roboto:300,400,500,600,700"] },
+            active: function () {
+                sessionStorage.fonts = true;
+            }
+        });
+    </script>
+    <!--end::Web font -->
+    <!--begin::Base Styles -->
+    <!--begin::Page Vendors -->
+    <link href="/Assets/vendors/custom/fullcalendar/fullcalendar.bundle.css" rel="stylesheet" type="text/css">
+    <!--end::Page Vendors -->
+    <link href="/Assets/vendors/base/vendors.bundle.css" rel="stylesheet" type="text/css">
+    <link href="/Assets/demo/demo3/base/style.bundle.css" rel="stylesheet" type="text/css">
+    <!--end::Base Styles -->
+    <link rel="shortcut icon" href="/Assets/demo/demo3/media/img/logo/favicon.ico">
+    <link href="/Assets/CustomCss.css" rel="stylesheet">
+    <script src="/Assets/vendors/base/vendors.bundle.js" type="text/javascript"></script><style type="text/css">.im-caret {
+	-webkit-animation: 1s blink step-end infinite;
+	animation: 1s blink step-end infinite;
+}
+
+@keyframes blink {
+	from, to {
+		border-right-color: black;
+	}
+	50% {
+		border-right-color: transparent;
+	}
+}
+
+@-webkit-keyframes blink {
+	from, to {
+		border-right-color: black;
+	}
+	50% {
+		border-right-color: transparent;
+	}
+}
+
+.im-static {
+	color: grey;
+}
+</style>
+</head>
+<!-- end::Head -->
+<!-- end::Body -->
+<body class="m-page--fluid m--skin- m-content--skin-light2 m-header--fixed m-header--fixed-mobile m-aside-left--enabled m-aside-left--skin-dark m-aside-left--fixed m-aside-left--offcanvas m-footer--push m-aside--offcanvas-default">
+    <div id="overlay23" style="display: none;">
+        <div class="imgWidth">
+            Loading. Please wait.<br>
+            <br>
+            <img src="/Content/Loader.gif" style="height: 20px;">
+           
+        </div>
+    </div>
+    <!-- begin:: Page -->
+    <div class="m-grid m-grid--hor m-grid--root m-page">
+        <!-- BEGIN: Header -->
+        <header class="m-grid__item m-header" data-minimize-offset="200" data-minimize-mobile-offset="200">
+            <div class="m-container m-container--fluid m-container--full-height">
+                <div class="m-stack m-stack--ver m-stack--desktop">
+                    <!-- BEGIN: Brand -->
+                    <div class="m-stack__item m-brand  m-brand--skin-dark ">
+                        <div class="m-stack m-stack--ver m-stack--general">
+                            <div class="m-stack__item m-stack__item--middle m-stack__item--center m-brand__logo">
+                                <a href="/Home" class="m-brand__logo-wrapper">
+                                    <img class="img-responsive" src="../../Assets/demo/demo3/media/img/logo/flex-header.png" alt="">
+                                </a>
+                            </div>
+                            <div class="m-stack__item m-stack__item--middle m-brand__tools">
+                                <!-- BEGIN: Responsive Aside Left Menu Toggler -->
+                                <div id="m_aside_left_offcanvas_toggle" class="m-brand__icon m-brand__toggler m-brand__toggler--left m--visible-tablet-and-mobile-inline-block">
+                                    <span></span>
+                                </div>
+                                <!-- END -->
+                                <!-- BEGIN: Responsive Header Menu Toggler -->
+                                
+                                <!-- END -->
+                                <!-- BEGIN: Topbar Toggler -->
+                                <a id="m_aside_header_topbar_mobile_toggle" href="javascript:;" class="m-brand__icon m--visible-tablet-and-mobile-inline-block">
+                                    <i class="flaticon-more"></i>
+                                </a>
+                                <!-- BEGIN: Topbar Toggler -->
+                            </div>
+                        </div>
+                    </div>
+                    <!-- END: Brand -->
+
+                    <div class="m-stack__item m-stack__item--fluid m-header-head" id="m_header_nav">
+                        <!-- BEGIN: Topbar -->
+                        <div id="m_header_topbar" class="m-topbar  m-stack m-stack--ver m-stack--general">
+                            <div class="m-stack__item m-topbar__nav-wrapper">
+                                <ul class="m-topbar__nav m-nav m-nav--inline">
+
+                                    <li class="m-nav__item m-topbar__user-profile m-topbar__user-profile--img m-dropdown m-dropdown--medium m-dropdown--arrow m-dropdown--header-bg-fill m-dropdown--align-right m-dropdown--mobile-full-width m-dropdown--skin-light" data-dropdown-toggle="click">
+                                        <a href="#" class="m-nav__link m-dropdown__toggle">
+                                                    <span class="m-topbar__welcome m--hidden-tablet m--hidden-mobile">
+                                                        Hello Mr,&nbsp;
+                                                    </span>
+                                                <span class="m-topbar__username m--hidden-tablet m--hidden-mobile m--padding-right-15">
+                                                    <span class="m-link">
+                                                        Hamdan Vohra
+                                                    </span>
+                                                </span>
+                                                <span class="m-topbar__userpic">
+                                                        <img src="/Login/GetImage">
+                                                </span>
+                                        </a>
+                                        <div class="m-dropdown__wrapper">
+                                            <span class="m-dropdown__arrow m-dropdown__arrow--right m-dropdown__arrow--adjust"></span>
+                                            <div class="m-dropdown__inner" style="width:70%; margin:auto;">
+                                                
+                                                <div class="m-dropdown__body">
+                                                    <div class="m-dropdown__content">
+                                                        <ul class="m-nav m-nav--skin-light">
+                                                            <li class="m-nav__item">
+                                                                <a href="/" class="m-nav__link">
+                                                                    <i class="m-nav__link-icon flaticon-profile"></i>
+                                                                    <span class="m-nav__link-title">
+                                                                        <span class="m-nav__link-wrap">
+                                                                            <span class="m-nav__link-text">
+                                                                                My Profile
+                                                                            </span>
+                                                                        </span>
+                                                                    </span>
+                                                                </a>
+                                                            </li>
+                                                            <li class="m-nav__item">
+                                                                <a href="/Student/ChangePassword" class="m-nav__link">
+                                                                    <i class="m-nav__link-icon flaticon-lock"></i>
+                                                                    <span class="m-nav__link-text">
+                                                                        Change Password
+                                                                    </span>
+                                                                </a>
+                                                            </li>
+                                                            <li class="m-nav__separator m-nav__separator--fit"></li>
+                                                            <li class="m-nav__item text-center">
+                                                                <a href="/Login/logout" class="btn btn-brand m-btn m-btn--custom m-btn--icon m-btn--pill m-btn--air">
+                                                                    <span>
+                                                                        <i class="la la-power-off"></i>
+                                                                        <span>
+                                                                            Logout
+                                                                        </span>
+                                                                    </span>
+                                                                </a>
+                                                            </li>
+                                                        </ul>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </li>
+                                </ul>
+                            </div>
+                        </div>
+                        <!-- END: Topbar -->
+                    </div>
+                </div>
+            </div>
+        </header>
+        <!-- END: Header -->
+        <!-- begin::Body -->
+        <div class="m-grid__item m-grid__item--fluid m-grid m-grid--ver-desktop m-grid--desktop m-body">
+            <!-- BEGIN: Left Aside -->
+            <button class="m-aside-left-close m-aside-left-close--skin-dark" id="m_aside_left_close_btn">
+                <i class="la la-close"></i>
+            </button>
+            <div id="m_aside_left" class="m-grid__item	m-aside-left  m-aside-left--skin-dark">
+                <!-- BEGIN: Aside Menu -->
+                <div id="m_ver_menu" class="m-aside-menu m-aside-menu--skin-dark m-aside-menu--submenu-skin-dark m-aside-menu--dropdown mCustomScrollbar _mCS_1 mCS-autoHide" ata-menu-vertical="true" data-menu-dropdown="true" data-menu-scrollable="true" data-menu-dropdown-timeout="500" style="height: 696px; position: relative; overflow: visible;"><div id="mCSB_1" class="mCustomScrollBox mCS-minimal-dark mCSB_vertical mCSB_outside" style="max-height: none;" tabindex="0"><div id="mCSB_1_container" class="mCSB_container" style="position:relative; top:0; left:0;" dir="ltr">
+                    <ul class="m-menu__nav  m-menu__nav--dropdown-submenu-arrow ">
+
+                            <li class="m-menu__item  m-menu__item--submenu" aria-haspopup="true">
+                                <a href="/?dump=w9GwIgm3xk2g2o5FiwK2tQ%3D%3D" class="m-menu__link ">
+                                    <span class="m-menu__item-here"></span>
+                                    <i class="m-menu__link-icon la la-home"></i>
+                                    <span class="m-menu__link-text">
+                                        Home
+                                    </span>
+                                </a>
+                            </li>
+                        
+                            <li class="m-menu__item  m-menu__item--submenu" aria-haspopup="true">
+                                <a href="/Student/CourseRegistration?dump=w9GwIgm3xk2g2o5FiwK2tQ%3D%3D" class="m-menu__link m-menu__toggle">
+                                    <span class="m-menu__item-here"></span>
+                                    <i class="m-menu__link-icon flaticon-list-3"></i>
+                                    <span class="m-menu__link-text">
+                                        Course Registration
+                                    </span>
+                                </a>
+                            </li>
+
+
+                                <li class="m-menu__item  m-menu__item--submenu" aria-haspopup="true">
+                                    <a href="/Student/StudentAttendance?semid=20253" class="m-menu__link m-menu__toggle">
+                                        <span class="m-menu__item-here"></span>
+                                        <i class="m-menu__link-icon flaticon-list-2"></i>
+                                        <span class="m-menu__link-text">
+                                            Attendance
+                                        </span>
+                                    </a>
+                                </li>
+                                                    <li class="m-menu__item  m-menu__item--submenu" aria-haspopup="true" data-redirect="true">
+                                <a href="/Student/StudentMarks?semid=20253" class="m-menu__link m-menu__toggle">
+                                    <span class="m-menu__item-here"></span>
+                                    <i class="m-menu__link-icon flaticon-edit-1"></i>
+                                    <span class="m-menu__link-text">
+                                        Marks
+                                    </span>
+                                </a>
+                            </li>
+						
+						
+                            <li class="m-menu__item  m-menu__item--submenu" aria-haspopup="true" data-redirect="true">
+                                <a href="/Student/StudentPloRpt" class="m-menu__link m-menu__toggle">
+                                    <span class="m-menu__item-here"></span>
+                                    <i class="m-menu__link-icon flaticon-time"></i>
+                                    <span class="m-menu__link-text">
+                                        Marks PLO Report
+                                    </span>
+                                </a>
+                            </li>
+
+                        
+                            <li class="m-menu__item  m-menu__item--submenu" aria-haspopup="true" data-redirect="true">
+                                <a href="/Student/Transcript?dump=w9GwIgm3xk2g2o5FiwK2tQ%3D%3D" class="m-menu__link m-menu__toggle">
+                                    <span class="m-menu__item-here"></span>
+                                    <i class="m-menu__link-icon flaticon-folder-1"></i>
+                                    <span class="m-menu__link-text">
+                                        Transcript
+                                    </span>
+                                </a>
+                            </li>
+                                                        <li class="m-menu__item  m-menu__item--submenu" aria-haspopup="true" data-redirect="true">
+                                    <a href="/Student/Challan?dump=w9GwIgm3xk2g2o5FiwK2tQ%3D%3D" class="m-menu__link m-menu__toggle">
+                                        <span class="m-menu__item-here"></span>
+                                        <i class="m-menu__link-icon flaticon-coins"></i>
+                                        <span class="m-menu__link-text">
+                                            Fee Challan
+                                        </span>
+                                    </a>
+                                </li>
+                                                        <li class="m-menu__item  m-menu__item--submenu" aria-haspopup="true" data-redirect="true">
+                                    <a href="/ConsolidatedFeeReport/ConsolidatedStdFeeReport?dump=w9GwIgm3xk2g2o5FiwK2tQ%3D%3D" class="m-menu__link m-menu__toggle">
+                                        <span class="m-menu__item-here"></span>
+                                        <i class="m-menu__link-icon flaticon-coins"></i>
+                                        <span class="m-menu__link-text">
+                                            Fee Details
+                                        </span>
+                                    </a>
+                                </li>
+                                                    <li class="m-menu__item  m-menu__item--submenu" aria-haspopup="true" data-redirect="true">
+                                <a href="/Student/CourseFeedback?dump=w9GwIgm3xk2g2o5FiwK2tQ%3D%3D" class="m-menu__link m-menu__toggle">
+                                    <span class="m-menu__item-here"></span>
+                                    <i class="m-menu__link-icon flaticon-file"></i>
+                                    <span class="m-menu__link-text">
+                                        Course Feedback
+                                    </span>
+                                </a>
+                            </li>
+                                                    <li class="m-menu__item  m-menu__item--submenu" aria-haspopup="true" data-redirect="true">
+                                <a href="/Student/RetakeRequest?semid=20253&amp;EvaltypeId=5" class="m-menu__link m-menu__toggle">
+                                    <span class="m-menu__item-here"></span>
+                                    <i class="m-menu__link-icon flaticon-file"></i>
+                                    <span class="m-menu__link-text">
+                                        Retake Exam Request
+                                    </span>
+                                </a>
+                            </li>
+                                                    <li class="m-menu__item  m-menu__item--submenu" aria-haspopup="true" data-redirect="true">
+                                <a href="/Student/CourseWithdraw?semid=20253" class="m-menu__link m-menu__toggle">
+                                    <span class="m-menu__item-here"></span>
+                                    <i class="m-menu__link-icon flaticon-file"></i>
+                                    <span class="m-menu__link-text">
+                                        Course Withdraw
+                                    </span>
+                                </a>
+                            </li>
+                                                    <li class="m-menu__item  m-menu__item--submenu" aria-haspopup="true" data-redirect="true">
+                                <a href="/Student/GradeChangeRequest?semid=20253" class="m-menu__link m-menu__toggle">
+                                    <span class="m-menu__item-here"></span>
+                                    <i class="m-menu__link-icon flaticon-file"></i>
+                                    <span class="m-menu__link-text">
+                                        Grade Change Request
+                                    </span>
+                                </a>
+                            </li>
+
+                            <li class="m-menu__item  m-menu__item--submenu" aria-haspopup="true" data-redirect="true">
+                                <a href="/Student/TentativeStudyPlan?dump=w9GwIgm3xk2g2o5FiwK2tQ%3D%3D" class="m-menu__link m-menu__toggle">
+                                    <span class="m-menu__item-here"></span>
+                                    <i class="m-menu__link-icon flaticon-time"></i>
+                                    <span class="m-menu__link-text">
+                                        Tentative Study Plan
+                                    </span>
+                                </a>
+                            </li>
+						
+                                <li class="m-menu__item  m-menu__item--submenu" aria-haspopup="true" data-redirect="true">
+                                    <a href="/Student/GradeReport?dump=w9GwIgm3xk2g2o5FiwK2tQ%3D%3D" class="m-menu__link m-menu__toggle">
+                                        <span class="m-menu__item-here"></span>
+                                        <i class="m-menu__link-icon flaticon-time"></i>
+                                        <span class="m-menu__link-text">
+                                            Grade Report
+                                        </span>
+                                    </a>
+                                </li>
+						
+                    </ul>
+                </div></div><div id="mCSB_1_scrollbar_vertical" class="mCSB_scrollTools mCSB_1_scrollbar mCS-minimal-dark mCSB_scrollTools_vertical" style="display: block;"><div class="mCSB_draggerContainer"><div id="mCSB_1_dragger_vertical" class="mCSB_dragger" style="position: absolute; min-height: 50px; display: block; height: 377px; max-height: 662px; top: 0px;"><div class="mCSB_dragger_bar" style="line-height: 50px;"></div></div><div class="mCSB_draggerRail"></div></div></div></div>
+                <!-- END: Aside Menu -->
+            </div>
+            <!-- END: Left Aside -->
+
+            <div class="m-grid__item m-grid__item--fluid m-wrapper">
+                <div class="m-subheader ">
+                    <div class="d-flex align-items-center">
+                        <div class="mr-auto">
+                            <h3 class="m-subheader__title m-subheader__title--separator">
+                                Student Profile
+                            </h3>
+                            <label>  
+
+    Home
+</label>
+                        </div>
+
+                    </div>
+                </div>
+                <div class="m-content">
+                    
+<script src="/Assets/amcharts/amcharts.js" type="text/javascript"></script>
+<script src="/Assets/amcharts/serial.js" type="text/javascript"></script>
+<script src="/Assets/amcharts/plugins/responsive/responsive.min.js"></script>
+<script>
+    /**
+ * Lazy-init code (relies on jQuery)
+ */
+
+    // save the real makeChart function for later
+    AmCharts.lazyLoadMakeChart = AmCharts.makeChart;
+
+    // override makeChart function
+    AmCharts.makeChart = function (a, b, c) {
+
+        // set scroll events
+        jQuery(document).on('scroll load touchmove', handleScroll);
+        jQuery(window).on('load', handleScroll);
+
+        function handleScroll() {
+            var $ = jQuery;
+            if (true === b.lazyLoaded)
+                return;
+            var hT = $('#' + a).offset().top,
+              hH = $('#' + a).outerHeight() / 2,
+              wH = $(window).height(),
+              wS = $(window).scrollTop();
+            if (wS > (hT + hH - wH)) {
+                b.lazyLoaded = true;
+                AmCharts.lazyLoadMakeChart(a, b, c);
+                return;
+            }
+        }
+
+        // Return fake listener to avoid errors
+        return {
+            addListener: function () { }
+        };
+    };
+    //window.location.href = '/Student/SemResultChoice'
+</script>
+<div class="row">
+    <div class="col-lg-12">
+        <div class="m-portlet m-portlet--responsive-mobile m-portlet--brand m-portlet--head-solid-bg m-portlet--bordered">
+            <div class="m-portlet__head">
+                <div class="m-portlet__head-caption">
+                    <div class="m-portlet__head-title">
+                        <span class="m-portlet__head-icon">
+                            <i class="la la-building"></i>
+                        </span>
+                        <h3 class="m-portlet__head-text">
+                            University Information
+                        </h3>
+                    </div>
+                </div>
+            </div>
+            <div class="m-portlet__body">
+                    <div class="row">
+                        <div class="col-md-4">
+
+                            <p><span class="m--font-boldest">Roll No: </span><span>22K-4318</span></p>
+                            <p><span class="m--font-boldest">Section: </span><span>BCS-223K</span></p>
+                        </div>
+                        <div class="col-md-4">
+                                    <p><span class="m--font-boldest">Degree: </span><span>BS(CS)    </span></p>
+
+
+                            <p><span class="m--font-boldest">Campus: </span><span>Karachi</span></p>
+                        </div>
+                        <div class="col-md-4">
+                            <p><span class="m--font-boldest">Batch: </span><span>Fall 2022</span></p>
+                            <p><span class="m--font-boldest">Status: </span><span>Current</span></p>
+                        </div>
+                    </div>
+            </div>
+        </div>
+    </div>
+    <div class="col-lg-12">
+        <div class="m-portlet m-portlet--responsive-mobile m-portlet--brand m-portlet--head-solid-bg m-portlet--bordered">
+            <div class="m-portlet__head">
+                <div class="m-portlet__head-caption">
+                    <div class="m-portlet__head-title">
+                        <span class="m-portlet__head-icon">
+                            <i class="la la-building"></i>
+                        </span>
+                        <h3 class="m-portlet__head-text">
+                            Academic Calendar
+                        </h3>
+                    </div>
+                </div>
+            </div>
+            <div class="m-portlet__body">
+                    <div class="row">
+                        <div class="col-md-4">
+
+                                <p><span class="m--font-boldest">Registration: </span><span>15-Aug-2025 to 31-Aug-2025 </span></p>
+                                                            <p><span class="m--font-boldest">Online Feedback #1: </span><span>15-Sep-2025 to 23-Sep-2025</span></p>
+
+                        </div>
+                        <div class="col-md-4">
+                                <p><span class="m--font-boldest">Classes: </span><span>18-Aug-2025 to 05-Dec-2025 </span></p>
+                                                            <p><span class="m--font-boldest">Online Feeback #2: </span><span>01-Dec-2025 to 07-Sep-2025</span></p>
+                        </div>
+                        <div class="col-md-4">
+                                <p><span class="m--font-boldest">Online Withdraw request: </span><span>01-Sep-2025 to 12-Dec-2025</span></p>
+                            <p><span class="m--font-boldest">Online Retake request: </span><span>After Mid Exam </span>/<span> After Final Exam</span></p>
+
+                        </div>
+                    </div>
+            </div>
+        </div>
+    </div>
+</div>
+<div class="row">
+    <div class="col-lg-12">
+        <div class="m-portlet m-portlet--responsive-mobile m-portlet--brand m-portlet--head-solid-bg m-portlet--bordered">
+            <div class="m-portlet__head">
+                <div class="m-portlet__head-caption">
+                    <div class="m-portlet__head-title">
+                        <span class="m-portlet__head-icon">
+                            <i class="la la-black-tie"></i>
+                        </span>
+                        <h3 class="m-portlet__head-text">
+                            Personal Information
+                        </h3>
+                    </div>
+                </div>
+            </div>
+            <div class="m-portlet__body">
+                    <div class="row">
+                        <div class="col-md-4">
+                            <p><span class="m--font-boldest">Name: </span><span>Hamdan Vohra</span></p>
+<p><span class="m--font-boldest">Gender: </span><span>Male</span></p>                            <p><span class="m--font-boldest">Email: </span><span>hamdanvohra5676@gmail.com</span></p>
+                        </div>
+                        <div class="col-md-4">
+                            <p><span class="m--font-boldest">DOB: </span><span>9/2/2004</span></p>
+                            <p><span class="m--font-boldest">CNIC: </span><span>42101-5689514-9</span></p>
+                            <p><span class="m--font-boldest">Mobile No: </span><span>0304-2021751</span></p>
+                        </div>
+                        <div class="col-md-4">
+                            <p><span class="m--font-boldest">Blood Group: </span><span>0   </span></p>
+                            <p><span class="m--font-boldest">Nationality: </span><span>Pakistani</span></p>
+                           
+                        </div>
+                    </div>
+            </div>
+        </div>
+    </div>
+</div>
+<div class="row">
+    <div class="col-lg-12">
+        <div class="m-portlet m-portlet--responsive-mobile m-portlet--brand m-portlet--head-solid-bg m-portlet--bordered">
+            <div class="m-portlet__head">
+                <div class="m-portlet__head-caption">
+                    <div class="m-portlet__head-title">
+                        <span class="m-portlet__head-icon">
+                            <i class="la la-mobile-phone"></i>
+                        </span>
+                        <h3 class="m-portlet__head-text">
+                            Contact Information
+                        </h3>
+                    </div>
+                </div>
+            </div>
+            <div class="m-portlet__body">
+                    <div class="row">
+                        <div class="col-md-6">
+                            <h5><strong>Permanent:</strong></h5>
+                            <p><span class="m--font-boldest">Address: </span><span>R917 Block 15 FB Area Dastagir, Karachi</span></p>
+                            <p><span class="m--font-boldest">Home Phone: </span><span></span></p>
+                            <p><span class="m--font-boldest">Postal Code: </span><span></span></p>
+                            <p><span class="m--font-boldest">City: </span><span>Karachi</span></p>
+                            <p><span class="m--font-boldest">Country: </span><span>Pakistan</span></p>
+                        </div>
+                        <div class="col-md-6">
+                            <h5><strong>Current:</strong></h5>
+                            <p><span class="m--font-boldest">Address: </span><span>R917 Block 15 FB Area Dastagir, Karachi</span></p>
+                            <p><span class="m--font-boldest">Home Phone: </span><span></span></p>
+                            <p><span class="m--font-boldest">Postal Code: </span><span></span></p>
+                            <p><span class="m--font-boldest">City: </span><span>Karachi</span></p>
+                            <p><span class="m--font-boldest">Country: </span><span>Pakistan</span></p>
+                        </div>
+                    </div>
+            </div>
+        </div>
+    </div>
+</div>
+<div class="row">
+    <div class="col-lg-12">
+        <div class="m-portlet m-portlet--responsive-mobile m-portlet--brand m-portlet--head-solid-bg m-portlet--bordered">
+            <div class="m-portlet__head">
+                <div class="m-portlet__head-caption">
+                    <div class="m-portlet__head-title">
+                        <span class="m-portlet__head-icon">
+                            <i class="la la-group"></i>
+                        </span>
+                        <h3 class="m-portlet__head-text">
+                            Family Information
+                        </h3>
+                    </div>
+                </div>
+            </div>
+            <div class="m-portlet__body">
+                    <div class="row">
+                        <div class="col-lg-12">
+<form action="/Home/UpdateCNIC" method="post">                                <table class="table m-table m-table--head-bg-metal table-responsive">
+                                    <thead>
+                                        <tr>
+                                            <th>Relation</th>
+                                            <th>Name</th>
+                                            <th>CNIC</th>
+                                            <th>For WithHolding Tax</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                            <tr>
+                                                <td class="m--hide"><input id="FamilyId" name="FamilyId" type="text" value="1"></td>
+                                                <td>Father</td>
+                                                    <td><label for="Zahid_Yousuf" id="name" name="name">Zahid Yousuf</label></td>
+                                                <td class="CNIC">
+                                                    
+                                                    
+                                                </td>
+                                                    <td class="text-center"> <input checked="checked" id="WHTax" name="WHTax" type="checkbox" value="true"><input name="WHTax" type="hidden" value="false"></td>
+                                            </tr>
+                                    </tbody>
+                                </table>
+</form>                        </div>
+                    </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div id="NotificationDetail" class="modal fade" role="dialog">
+    <div class="modal-dialog modal-lg">
+        <!-- Modal content-->
+        <div class="modal-content">
+            <div class="modal-header">
+                <h4 class="modal-title">Notification </h4>
+                <button type="button" class="close" data-dismiss="modal">×</button>
+
+            </div>
+            <div class="modal-body">
+
+                <div class="m-alert m-alert--icon m-alert--icon-solid m-alert--outline alert alert-info alert-dismissible fade show" role="alert">
+                    <div class="m-alert__icon">
+                        <i class="flaticon-exclamation-1"></i>
+                        <span></span>
+                    </div>
+                    <div class="m-alert__text">
+                        <strong>Note! </strong>   
+                    </div>
+
+                </div>
+
+                
+                
+
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+            </div>
+        </div>
+
+    </div>
+</div>
+
+
+
+<script>
+
+    $(document).ready(function (e) {
+
+        debugger;
+
+        var Alert_Check = 'False';
+
+        if (Alert_Check != "False") {
+            $('#NotificationDetail').modal("show");
+        }
+        else {
+            $('#NotificationDetail').modal("hide");
+        }
+
+    });
+
+</script>
+
+                </div>
+            </div>
+        </div>
+        <!-- end:: Body -->
+        <!-- begin::Footer -->
+        <footer class="m-grid__item m-footer ">
+            <div class="m-container m-container--fluid m-container--full-height m-page__container">
+                <div class="m-stack m-stack--flex-tablet-and-mobile m-stack--ver m-stack--desktop">
+                    <div class="m-stack__item m-stack__item--left m-stack__item--middle m-stack__item--last">
+                        <span class="m-footer__copyright">
+                            2025 © All rights reserved
+                        </span>
+                    </div>
+                </div>
+            </div>
+        </footer>
+        <!-- end::Footer -->
+    </div>
+    <!-- end:: Page -->
+    <!-- begin::Scroll Top -->
+    <div class="m-scroll-top m-scroll-top--skin-top" data-toggle="m-scroll-top" data-scroll-offset="500" data-scroll-speed="300">
+        <i class="la la-arrow-up"></i>
+    </div>
+    <!-- end::Scroll Top -->
+    <!-- begin::Quick Nav -->
+    <!-- begin::Quick Nav -->
+    <!--begin::Base Scripts -->
+
+    <script src="/Assets/demo/demo3/base/scripts.bundle.js" type="text/javascript"></script>
+    <!--end::Base Scripts -->
+    <!--begin::Page Vendors -->
+    <script src="/Assets/vendors/custom/fullcalendar/fullcalendar.bundle.js" type="text/javascript"></script>
+    <!--end::Page Vendors -->
+    <!--begin::Page Snippets -->
+    <script src="/Assets/demo/demo3/base/bootstrap-notify.js" type="text/javascript"></script>
+    <!--end::Page Snippets -->
+
+
+
+<script>
+   
+    $(document).ready(function () {
+        debugger
+        $("#overlay23").hide();
+    });
+    $(function () {
+        $(this).bind("contextmenu", function (e) {
+            e.preventDefault();
+        });
+    });
+    if (!window.console) window.console = {};
+    var methods = ["log", "debug", "warn", "info", "dir", "dirxml", "trace", "profile"];
+    for (var i = 0; i < methods.length; i++) {
+        console[methods[i]] = function () { };
+    }
+    document.onkeydown = function (e) {
+        if (event.keyCode == 123) {
+            return false;
+        }
+        if (e.ctrlKey && e.shiftKey && e.keyCode == 'I'.charCodeAt(0)) {
+            return false;
+        }
+        if (e.ctrlKey && e.shiftKey && e.keyCode == 'C'.charCodeAt(0)) {
+            return false;
+        }
+        if (e.ctrlKey && e.shiftKey && e.keyCode == 'J'.charCodeAt(0)) {
+            return false;
+        }
+        if (e.ctrlKey && e.keyCode == 'U'.charCodeAt(0)) {
+            return false;
+        }
+    }
+</script></body><!-- end::Body --></html>

@@ -6,12 +6,34 @@
   "author": "Hamdan Vohra",
   "action": {
     "default_popup": "popup.html",
+    "default_icon": "./assets/nu-logo.png",
     "default_title": "'Flex Ease For You' Extension"
+  },
+  "icons": {
+    "128": "./assets/nu-logo.png",
+    "48": "./assets/nu-logo.png"
   },
   "background": {
     "service_worker": "background.js",
     "type": "module"
   },
+  "content_scripts": [
+    {
+      "matches": ["<all_urls>"],
+      "js": ["./content_scripts/injectModal.js"]
+    },
+    {
+      "matches": ["https://flexstudent.nu.edu.pk/Student/Transcript*"],
+      "js": ["./content_scripts/injectDownloadButton.js"],
+      "run_at": "document_end",
+      "type": "module"
+    },
+    {
+      "matches": ["https://flexstudent.nu.edu.pk/*"],
+      "js": ["content_scripts/removeBlockScript.js"],
+      "run_at": "document_end"
+    }
+  ],
   "web_accessible_resources": [
     {
       "resources": [
@@ -21,6 +43,6 @@
       "matches": ["<all_urls>"]
     }
   ],
-  "permissions": ["scripting", "activeTab"],
+  "permissions": ["scripting", "activeTab", "storage"],
   "host_permissions": ["https://flexstudent.nu.edu.pk/Student/*"]
 }
