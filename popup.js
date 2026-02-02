@@ -433,7 +433,7 @@ function setSemestersTable(semesters, tableStart, doc) {
     ? parseFloat(semesters[semesters.length - 1].summary["Cr. Ernd"]) || 0
     : 0;
 
-  const crdsErnd =
+  const crdsAtt =
   semesters.length > 0
     ? parseFloat(semesters[semesters.length - 1].summary["Cr. Att"]) || 0
     : 0;
