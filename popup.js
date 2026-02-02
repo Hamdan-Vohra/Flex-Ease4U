@@ -428,21 +428,23 @@ function setSemestersTable(semesters, tableStart, doc) {
   }
 
   // Transcript Summary (custom layout)
-  const crdsErnd = semesters.reduce((sum, sem) => {
-    const val = parseFloat(sem.summary["Cr. Ernd"]);
-    return sum + (isNaN(val) ? 0 : val);
-  }, 0);
-  const crdsAtt = semesters.reduce((sum, sem) => {
-    const val = parseFloat(sem.summary["Cr. Att"]);
-    return sum + (isNaN(val) ? 0 : val);
-  }, 0);
+  const crdsErnd =
+  semesters.length > 0
+    ? parseFloat(semesters[semesters.length - 1].summary["Cr. Ernd"]) || 0
+    : 0;
+
+  const crdsErnd =
+  semesters.length > 0
+    ? parseFloat(semesters[semesters.length - 1].summary["Cr. Att"]) || 0
+    : 0;
+
   const cgpa =
     semesters.length > 0
       ? semesters[semesters.length - 1].summary["CGPA"] || ""
       : "";
 
   // If you have percentage, calculate or fetch it here
-  const percentage = cgpa ? (parseFloat(cgpa) * 25).toFixed(2) : ""; // Example conversion
+  const percentage = cgpa ? (parseFloat(cgpa) * 25).toFixed(2) : "";
 
   const leftX = masterData.marginLeft;
   const boxWidth = pageWidth - masterData.marginLeft * 2;
