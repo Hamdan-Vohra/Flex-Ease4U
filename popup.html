@@ -67,36 +67,106 @@
         gap: 8px;
         box-shadow: 0 1px 4px rgba(0, 0, 0, 0.04);
       }
-      #get-details {
-        background: linear-gradient(90deg, #4caf50 60%, #388e3c 100%);
-        color: #fff;
+      button:disabled {
+        opacity: 0.6;
+        cursor: not-allowed;
       }
-      #get-details:hover {
-        background: linear-gradient(90deg, #388e3c 60%, #4caf50 100%);
-      }
-      #get-details.clicked {
-        background: linear-gradient(90deg, #2e7d32 60%, #1b5e20 100%);
-        color: #fff;
+      /* Row holding the Download button + the photo toggle beside it */
+      .download-row {
+        display: flex;
+        align-items: stretch;
+        gap: 10px;
+        width: 100%;
       }
       #download-transcript {
-        background: linear-gradient(90deg, #e7e7e7 60%, #b0bec5 100%);
-        color: #003366;
+        background: linear-gradient(90deg, #4caf50 60%, #388e3c 100%);
+        color: #fff;
+        flex: 1 1 auto;
       }
-      #download-transcript:hover {
-        background: linear-gradient(90deg, #b0bec5 60%, #e7e7e7 100%);
-        color: #222;
+      #download-transcript:hover:not(:disabled) {
+        background: linear-gradient(90deg, #388e3c 60%, #4caf50 100%);
       }
       #remove-block-script {
         background: linear-gradient(90deg, #f44336 60%, #d32f2f 100%);
         color: #fff;
       }
-      #remove-block-script:hover {
+      #remove-block-script:hover:not(:disabled) {
         background: linear-gradient(90deg, #d32f2f 60%, #f44336 100%);
       }
       .icon {
         width: 18px;
         height: 18px;
         fill: currentColor;
+      }
+      /* Photo toggle pill sitting aside the Download button */
+      .photo-toggle {
+        flex: 0 0 auto;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        gap: 4px;
+        padding: 0 6px;
+        background: #f1f4f8;
+        border-radius: 8px;
+        border: 1px solid #e0e6ed;
+      }
+      .toggle-label {
+        font-size: 10px;
+        font-weight: 600;
+        color: #003366;
+        line-height: 1;
+      }
+      .switch {
+        position: relative;
+        display: inline-block;
+        width: 38px;
+        height: 20px;
+      }
+      .switch input {
+        opacity: 0;
+        width: 0;
+        height: 0;
+      }
+      .slider {
+        position: absolute;
+        cursor: pointer;
+        inset: 0;
+        background-color: #b0bec5;
+        transition: 0.2s;
+        border-radius: 20px;
+      }
+      .slider:before {
+        position: absolute;
+        content: "";
+        height: 14px;
+        width: 14px;
+        left: 3px;
+        bottom: 3px;
+        background-color: #fff;
+        transition: 0.2s;
+        border-radius: 50%;
+      }
+      .switch input:checked + .slider {
+        background-color: #4caf50;
+      }
+      .switch input:checked + .slider:before {
+        transform: translateX(18px);
+      }
+      .status {
+        width: 100%;
+        min-height: 18px;
+        margin-top: 4px;
+        font-size: 12px;
+        text-align: center;
+        color: #003366;
+      }
+      .status.error {
+        color: #c62828;
+      }
+      .status.success {
+        color: #2e7d32;
+        font-weight: 600;
       }
       .footer {
         margin-top: auto;
@@ -112,43 +182,37 @@
     <div class="popup-card">
       <h1>FlexEase</h1>
       <div class="button-group">
-        <button id="get-details" title="Required page: Home">
-          <span class="icon">
-            <svg
-              width="18"
-              height="18"
-              viewBox="0 0 24 24"
-              fill="none"
-              stroke="currentColor"
-              stroke-width="2"
-              stroke-linecap="round"
-              stroke-linejoin="round"
-            >
-              <path d="M3 9l9-7 9 7"></path>
-              <path d="M9 22V12h6v10"></path>
-            </svg>
-          </span>
-          Fetch Student Details
-        </button>
-        <button id="download-transcript" title="Required page: Transcript">
-          <span class="icon">
-            <svg
-              width="18"
-              height="18"
-              viewBox="0 0 24 24"
-              fill="none"
-              stroke="currentColor"
-              stroke-width="2"
-              stroke-linecap="round"
-              stroke-linejoin="round"
-            >
-              <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
-              <polyline points="7 10 12 15 17 10"></polyline>
-              <line x1="12" y1="15" x2="12" y2="3"></line>
-            </svg>
-          </span>
-          Download Transcript PDF
-        </button>
+        <div class="download-row">
+          <button
+            id="download-transcript"
+            title="Auto-fetches details and downloads your transcript from any page"
+          >
+            <span class="icon">
+              <svg
+                width="18"
+                height="18"
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                stroke-width="2"
+                stroke-linecap="round"
+                stroke-linejoin="round"
+              >
+                <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
+                <polyline points="7 10 12 15 17 10"></polyline>
+                <line x1="12" y1="15" x2="12" y2="3"></line>
+              </svg>
+            </span>
+            Download Transcript
+          </button>
+          <div class="photo-toggle" title="Include profile photo in the PDF">
+            <label class="switch">
+              <input type="checkbox" id="include-photo" checked />
+              <span class="slider"></span>
+            </label>
+            <span class="toggle-label">Photo</span>
+          </div>
+        </div>
         <button id="remove-block-script">
           <span class="icon">
             <svg
@@ -168,6 +232,7 @@
           Remove Block Script
         </button>
       </div>
+      <div id="status" class="status"></div>
       <div class="footer">FlexEase &copy; 2025 &mdash; Fast NU Karachi</div>
     </div>
     <script type="module" src="popup.js"></script>

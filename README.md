@@ -9,8 +9,9 @@ They can enjoy advance feature easily by using FlexEase.
 
 ## ✨ Features
 
-- Feature 1 – Download pdf of transcript from flex.
-- Feature 2 – Access inspect elements by removing the restrictions.
+- Feature 1 – One-click transcript PDF download. From **any** page on flex, a single **Download Transcript** button automatically opens the Home page to read your student details, opens the Transcript page to read your results, and downloads the PDF — no manual fetching required.
+- Feature 2 – **Photo toggle.** A switch beside the Download button lets you include or exclude your profile photo in the generated PDF.
+- Feature 3 – Access inspect elements by removing the restrictions.
 
 ---
 
@@ -25,21 +26,17 @@ Extension Popup:
 ## ⚙️ How It Works
 
 ####1. PDF Transcript Download
-First, you have to fetch the student details at Home Page.
+Just open the extension popup on **any** flex page (while logged in) and click **Download Transcript**.
 
-<img width="510" height="396" alt="image" src="https://github.com/user-attachments/assets/37ebcff4-7d40-40a2-b1c9-72c5b8d0f930" />
+The extension does the rest automatically:
 
-After you click the fetch button, it will go in dark green that's the confirmation that the details are fetched successfully.
+1. Navigates to the Home page and extracts your student details.
+2. Navigates to the Transcript page and extracts your semesters.
+3. Generates and downloads the transcript PDF.
 
-<img width="466" height="230" alt="image" src="https://github.com/user-attachments/assets/3b8603f7-dab3-4578-8d97-3a75728590fe" />
+A status line in the popup shows the current step, and ends with “Transcript downloaded ✓”.
 
-Then, route to the Transcript Page, reopen the extension, you'll be showing the button for downloading as shown below.
-
-<img width="462" height="391" alt="image" src="https://github.com/user-attachments/assets/6bbf7bf4-980f-4987-bfe7-bfb59cfe8c94" />
-
-Click on it, you'll get the downloaded transcript in pdf.
-
-<img width="484" height="111" alt="image" src="https://github.com/user-attachments/assets/07f03927-81ea-49c7-8278-6069582ba6de" />
+Use the **Photo** toggle beside the button to choose whether your profile photo is embedded in the PDF.
 
 ####2. Inspect Elements Access
 

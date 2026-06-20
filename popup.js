@@ -2,6 +2,8 @@ import { extractStudentInfo } from "./utils/studentdetails.js";
 import { nuLogoBase64 } from "./utils/nuLogo.js";
 import { extractTranscriptSemesters } from "./utils/transcriptdetails.js";
 
+const FLEX_ORIGIN = "https://flexstudent.nu.edu.pk";
+
 const masterData = {
   campusMap: {
     I: "Islamabad Campus",
@@ -44,36 +46,216 @@ const masterData = {
 };
 let studentInfo = null;
 
-document.addEventListener("DOMContentLoaded", function () {
-  (async () => {
-    // Load autoTable plugin only after jsPDF is present
-    if (
-      window.jspdf &&
-      typeof window.jspdf.jsPDF.API.autoTable === "undefined"
-    ) {
-      let script2 = document.createElement("script");
-      script2.src = chrome.runtime.getURL("libs/jspdf.plugin.autotable.min.js");
-      document.body.appendChild(script2);
-      await new Promise((r) => (script2.onload = r));
-    }
-    console.log(
-      "After autoTable load → ",
-      typeof window.jspdf?.jsPDF?.API?.autoTable
-    );
-  })();
+// ---------------------------------------------------------------------------
+// UI helpers
+// ---------------------------------------------------------------------------
+function setStatus(message, type) {
+  const el = document.getElementById("status");
+  if (!el) return;
+  el.textContent = message || "";
+  el.className = "status" + (type ? " " + type : "");
+}
 
-  // Load  persisted states from Local Storage
-  if (chrome && chrome.storage && chrome.storage.local) {
-    chrome.storage.local.get("studentInfo", (result) => {
-      if (result.studentInfo) {
-        studentInfo = result.studentInfo;
-        console.log("Loaded studentInfo from storage:", studentInfo);
+// ---------------------------------------------------------------------------
+// Tab / page helpers (run from the popup; popup stays open while the tab navigates)
+// ---------------------------------------------------------------------------
+async function getActiveTab() {
+  const [tab] = await chrome.tabs.query({
+    active: true,
+    currentWindow: true,
+  });
+  return tab;
+}
+
+// Read the full rendered HTML of a tab.
+async function getTabHtml(tabId) {
+  const [res] = await chrome.scripting.executeScript({
+    target: { tabId },
+    func: () => document.documentElement.outerHTML,
+  });
+  return res && res.result;
+}
+
+// Navigate a tab to a URL and resolve once it has finished loading.
+function navigateAndWait(tabId, url) {
+  return new Promise((resolve, reject) => {
+    let settled = false;
+    const timer = setTimeout(() => finish(), 20000); // safety timeout
+
+    function finish(err) {
+      if (settled) return;
+      settled = true;
+      clearTimeout(timer);
+      chrome.tabs.onUpdated.removeListener(listener);
+      err ? reject(err) : resolve();
+    }
+
+    function listener(updatedTabId, info) {
+      if (updatedTabId === tabId && info.status === "complete") {
+        // small buffer so late-rendered assets (e.g. the profile image) settle
+        setTimeout(() => finish(), 500);
+      }
+    }
+
+    chrome.tabs.onUpdated.addListener(listener);
+    chrome.tabs.update(tabId, { url }).catch(finish);
+  });
+}
+
+// Grab the profile picture from a tab as a Base64 JPEG (waits for it to load).
+async function getProfileImageBase64(tabId) {
+  const [res] = await chrome.scripting.executeScript({
+    target: { tabId },
+    func: async () => {
+      const imgTag = document.querySelector(".m-topbar__userpic img");
+      if (!imgTag) return null;
+      if (!imgTag.complete || imgTag.naturalWidth === 0) {
+        await new Promise((resolve) => {
+          imgTag.addEventListener("load", resolve, { once: true });
+          imgTag.addEventListener("error", resolve, { once: true });
+          setTimeout(resolve, 2000);
+        });
+      }
+      try {
+        const canvas = document.createElement("canvas");
+        canvas.width = imgTag.naturalWidth;
+        canvas.height = imgTag.naturalHeight;
+        const ctx = canvas.getContext("2d");
+        ctx.drawImage(imgTag, 0, 0);
+        return canvas.toDataURL("image/jpeg");
+      } catch (e) {
+        return null;
+      }
+    },
+  });
+  return (res && res.result) || null;
+}
+
+// Make sure the autoTable plugin is attached to jsPDF before we build a table.
+async function ensureAutoTable() {
+  if (window.jspdf && typeof window.jspdf.jsPDF.API.autoTable === "undefined") {
+    const script = document.createElement("script");
+    script.src = chrome.runtime.getURL("libs/jspdf.plugin.autotable.min.js");
+    document.body.appendChild(script);
+    await new Promise((r) => (script.onload = r));
+  }
+}
+
+// ---------------------------------------------------------------------------
+// One-click flow: Home (student details) -> Transcript (semesters) -> PDF
+// ---------------------------------------------------------------------------
+async function autoDownloadTranscript() {
+  const btn = document.getElementById("download-transcript");
+  const includePhoto = document.getElementById("include-photo").checked;
+
+  try {
+    btn.disabled = true;
+    await ensureAutoTable();
+
+    const tab = await getActiveTab();
+    if (!tab || !tab.url || !tab.url.startsWith(FLEX_ORIGIN)) {
+      setStatus(
+        "Open and log in to flexstudent.nu.edu.pk, then try again.",
+        "error"
+      );
+      return;
+    }
+
+    // Step 1 — Home page: extract student details + the real Transcript link.
+    setStatus("Opening Home page…");
+    await navigateAndWait(tab.id, FLEX_ORIGIN + "/");
+
+    setStatus("Extracting student details…");
+    const homeDom = new DOMParser().parseFromString(
+      await getTabHtml(tab.id),
+      "text/html"
+    );
+    const extracted = await extractStudentInfo(homeDom);
+    studentInfo = extracted.studentInfo;
+    if (!studentInfo || studentInfo.length === 0) {
+      setStatus(
+        "Couldn't read student details. Make sure you're logged in.",
+        "error"
+      );
+      return;
+    }
+    chrome.storage.local.set({ studentInfo });
+
+    // The Transcript nav link carries a `dump` session token — reuse it.
+    const link = homeDom.querySelector('a[href*="/Student/Transcript"]');
+    const transcriptUrl = link
+      ? new URL(link.getAttribute("href"), FLEX_ORIGIN).href
+      : FLEX_ORIGIN + "/Student/Transcript";
+
+    // Step 2 — Transcript page: extract the semesters.
+    setStatus("Opening Transcript page…");
+    await navigateAndWait(tab.id, transcriptUrl);
+
+    setStatus("Reading transcript…");
+    const transcriptDom = new DOMParser().parseFromString(
+      await getTabHtml(tab.id),
+      "text/html"
+    );
+    const semesters = extractTranscriptSemesters(transcriptDom);
+    if (!semesters || semesters.length === 0) {
+      setStatus("No transcript data found on the Transcript page.", "error");
+      return;
+    }
+
+    // Step 3 — Build and save the PDF.
+    setStatus("Generating PDF…");
+    await generateTranscriptPdf(semesters, includePhoto, tab.id);
+    setStatus("Transcript downloaded ✓", "success");
+  } catch (err) {
+    console.error("Auto download failed:", err);
+    setStatus("Something went wrong: " + (err?.message || err), "error");
+  } finally {
+    btn.disabled = false;
+  }
+}
+
+async function generateTranscriptPdf(semesters, includePhoto, tabId) {
+  const { jsPDF } = window.jspdf;
+  const doc = new jsPDF({ format: "legal", unit: "mm" });
+
+  // Transcript Header
+  let y = setHeader(doc);
+
+  // Student Information (optionally with profile photo)
+  const tableStart = await setStudentInfo(doc, y, includePhoto, tabId);
+
+  // Display Tables on PDF
+  setSemestersTable(semesters, tableStart, doc);
+
+  // Footer
+  setFooter(doc);
+
+  // Save PDF
+  const rollNo = studentInfo.find((i) => i.title === "Roll No")?.value;
+  doc.save(`transcript_${rollNo || "student"}.pdf`);
+}
+
+document.addEventListener("DOMContentLoaded", function () {
+  // Restore the "include photo" preference.
+  if (chrome?.storage?.local) {
+    chrome.storage.local.get("includePhoto", (result) => {
+      if (typeof result.includePhoto === "boolean") {
+        document.getElementById("include-photo").checked = result.includePhoto;
       }
     });
-  } else {
-    console.warn("chrome.storage.local is not available.");
   }
 
+  // Persist the toggle whenever it changes.
+  document.getElementById("include-photo").addEventListener("change", (e) => {
+    chrome.storage?.local?.set({ includePhoto: e.target.checked });
+  });
+
+  // One-click: fetch details + transcript and download, from any page.
+  document
+    .getElementById("download-transcript")
+    .addEventListener("click", autoDownloadTranscript);
+
+  // Remove right-click / dev-tools block script on the current page.
   document
     .getElementById("remove-block-script")
     .addEventListener("click", () => {
@@ -83,123 +265,12 @@ document.addEventListener("DOMContentLoaded", function () {
           { action: "removeBlockScript" },
           (response) => {
             if (response && response.success) {
-              alert("Block script removed successfully.");
+              setStatus("Block script removed.", "success");
             } else {
-              alert("Failed to remove block script.");
+              setStatus("Failed to remove block script.", "error");
             }
           }
         );
-      });
-    });
-
-  //listening for button click
-  const getDetailsBtn = document.getElementById("get-details");
-
-  getDetailsBtn.addEventListener("click", function () {
-    chrome.runtime.sendMessage({ action: "getContent" }, async (response) => {
-      if (response.success) {
-        const HTMLcontent = response.content;
-        const url = response.url;
-        try {
-          const u = new URL(url);
-          if (
-            !(
-              u.origin === "https://flexstudent.nu.edu.pk" && u.pathname === "/"
-            )
-          ) {
-            chrome.tabs.query({ active: true, currentWindow: true }, (tabs) => {
-              chrome.tabs.sendMessage(tabs[0].id, {
-                action: "showInstructionModal",
-                message:
-                  "To extract the student details, please go to the Home page.",
-              });
-            });
-            return;
-          }
-        } catch (e) {
-          console.error("Invalid URL:", url);
-        }
-
-        const dom = new DOMParser().parseFromString(HTMLcontent, "text/html");
-        let extracted = {};
-        try {
-          extracted = await extractStudentInfo(dom);
-        } catch (err) {
-          console.error("Error extracting student info:", err);
-          chrome.tabs.query({ active: true, currentWindow: true }, (tabs) => {
-            chrome.tabs.sendMessage(tabs[0].id, {
-              action: "showInstructionModal",
-              message:
-                "Unable to extract student details. Please reload and try again.",
-            });
-          });
-          return; // stop here
-        }
-
-        const { studentInfo } = extracted;
-
-        // Persist to chrome.storage.local
-        if (chrome && chrome.storage && chrome.storage.local) {
-          chrome.storage.local.set({ studentInfo }, () => {
-            console.log("Student Info saved to chrome.storage.local");
-          });
-        } else {
-          console.warn("chrome.storage.local is not available.");
-        }
-
-        getDetailsBtn.classList.add("clicked");
-      } else {
-        chrome.tabs.query({ active: true, currentWindow: true }, (tabs) => {
-          chrome.tabs.sendMessage(tabs[0].id, {
-            action: "showInstructionModal",
-            message: "Reload Page.",
-          });
-        });
-      }
-    });
-  });
-
-  document
-    .getElementById("download-transcript")
-    .addEventListener("click", async () => {
-      chrome.runtime.sendMessage({ action: "getContent" }, async (response) => {
-        if (response.success) {
-          const HTMLcontent = response.content;
-
-          const dom = new DOMParser().parseFromString(HTMLcontent, "text/html");
-          if (!studentInfo || response.url.indexOf("/Transcript") === -1) {
-            chrome.tabs.query({ active: true, currentWindow: true }, (tabs) => {
-              chrome.tabs.sendMessage(tabs[0].id, {
-                action: "showInstructionModal",
-                message:
-                  "Please go to the Home page first to extract student details. Then try downloading the transcript from the Transcript Page.",
-              });
-            });
-            return;
-          }
-          const { jsPDF } = window.jspdf;
-          const doc = new jsPDF({ format: "legal", unit: "mm" });
-          let y = 60;
-          // Transcript Header
-          y = setHeader(doc);
-
-          // Student Information
-          const tableStart = await setStudentInfo(doc, y); // Make setStudentInfo async
-
-          // Transcript Table
-          const semesters = extractTranscriptSemesters(dom);
-
-          //Display Tables on PDF
-          setSemestersTable(semesters, tableStart, doc);
-
-          // Footer
-          setFooter(doc);
-
-          // Save PDF
-          doc.save("student_transcript.pdf");
-        } else {
-          console.error("Error fetching content:", response.error);
-        }
       });
     });
 });
@@ -276,7 +347,7 @@ function setHeader(doc) {
   return y;
 }
 
-async function setStudentInfo(doc, y_start) {
+async function setStudentInfo(doc, y_start, includePhoto, tabId) {
   const pageWidth = doc.internal.pageSize.getWidth();
   const marginLeft = masterData.marginLeft;
   const centerX = pageWidth / 2 + 5;
@@ -337,13 +408,14 @@ async function setStudentInfo(doc, y_start) {
     y += lineHeight;
   });
 
-  // Calculate image position
-  const imgWidth = 22;
-  const imgHeight = 26;
-  const imgX = pageWidth - masterData.marginLeft - imgWidth;
-  const imgY = y_start;
-
-  await addProfileImage(doc, imgX, imgY, imgWidth, imgHeight);
+  // Profile photo (only when the toggle is on)
+  if (includePhoto) {
+    const imgWidth = 22;
+    const imgHeight = 26;
+    const imgX = pageWidth - masterData.marginLeft - imgWidth;
+    const imgY = y_start;
+    await addProfileImage(doc, imgX, imgY, imgWidth, imgHeight, tabId);
+  }
 
   return y;
 }
@@ -525,21 +597,15 @@ function formatDOB(dobStr) {
   return `${months[parseInt(month, 10) - 1]} ${parseInt(day, 10)}, ${year}`;
 }
 
-function addProfileImage(doc, x, y, width, height) {
-  return new Promise((resolve) => {
-    chrome.runtime.sendMessage(
-      { action: "getProfileImageBase64" },
-      (response) => {
-        if (response.success && response.base64) {
-          doc.addImage(response.base64, "JPEG", x, y, width, height);
-        } else {
-          console.warn(
-            "Profile image not found or error occurred:",
-            response.error
-          );
-        }
-        resolve();
-      }
-    );
-  });
+async function addProfileImage(doc, x, y, width, height, tabId) {
+  const base64 = await getProfileImageBase64(tabId);
+  if (base64) {
+    try {
+      doc.addImage(base64, "JPEG", x, y, width, height);
+    } catch (e) {
+      console.warn("Could not add profile image to PDF:", e);
+    }
+  } else {
+    console.warn("Profile image not found.");
+  }
 }
